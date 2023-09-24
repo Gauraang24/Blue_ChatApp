@@ -9,4 +9,4 @@ const config = {
   appId: "1:610492602230:web:ef2e7c29df261a75db0c57"
 }
 
-firebase.initializeApp(config)
+const app = firebase.initializeApp(config)
