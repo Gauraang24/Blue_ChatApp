@@ -12,6 +12,7 @@ const SignIn = () => {
     //  const result= await auth.signInWithPopup(provider)
     try {
       const { additionalUserInfo, user } = await auth.signInWithPopup(provider)
+
       if (additionalUserInfo.isNewUser) {
         await database.ref(`/profiles/${user.uid}`).set({
           name: user.displayName,
@@ -19,8 +20,9 @@ const SignIn = () => {
         })
       }
       Alert.success("Signed In", 4000)
+
     } catch (err) {
-      Alert.info(err.message, 4000)
+      Alert.error(err.message, 4000)
     }
 
     // console.log("result===", result)
