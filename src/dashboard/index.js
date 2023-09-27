@@ -3,6 +3,7 @@ import { Alert, Button, Divider, Drawer } from 'rsuite'
 import { useProfile } from "../context/profileContext"
 import EditableInput from '../components/EditableInput'
 import { database } from '../misc/firebase'
+import ProviderBlock from './ProviderBlock'
 
 const DashBoard = ({ onSignOut }) => {
   const { profile } = useProfile()
@@ -24,11 +25,12 @@ const DashBoard = ({ onSignOut }) => {
     <>
       <Drawer.Header>
         <Drawer.Title>
-          DashBoard
+          Dashboard
         </Drawer.Title>
       </Drawer.Header>
       <Drawer.Body>
         <h3>Hey, {profile.name}</h3>
+        <ProviderBlock/>
         <Divider />
         <EditableInput
           name="nickname"
@@ -40,7 +42,7 @@ const DashBoard = ({ onSignOut }) => {
       </Drawer.Body>
       <Drawer.Footer>
         <Button block color="red" onClick={onSignOut}>
-          sign Out
+          Sign Out
         </Button>
       </Drawer.Footer>
     </>
