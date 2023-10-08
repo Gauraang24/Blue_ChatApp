@@ -4,6 +4,7 @@ import { useModalState } from '../misc/customHooks'
 import AvatarEditor from 'react-avatar-editor'
 import { useProfile } from '../context/profileContext'
 import { database, storage } from '../misc/firebase'
+import ProfileAvatar from '../components/ProfileAvatar'
 
 const fileInputType = '.png, .jpeg, .jpg'
 const acceptedFileType = ['image/png', "image/jpeg", 'image/jpg']
@@ -27,7 +28,7 @@ const AvatarUploadBtn = () => {
 
     const { profile } = useProfile()
     const [img, setImg] = useState(null)
-    const [isLoading,setLoading]=useState(false)
+    const [isLoading, setLoading] = useState(false)
     const AvatarEditorRef = useRef()
 
     const onFileInputChange = (ev) => {
@@ -53,16 +54,22 @@ const AvatarUploadBtn = () => {
         try {
             const blob = await getBlob(canvas)
 
-            const avatarFIleRef = storage.ref(`/profile/${profile.uid}`).child("avatar")
-
-            const uploadAvatarResult = await avatarFIleRef.put(blob, {
-                cacheControl: `public,max-age=${3600 * 24 * 3}`
-            })
-            const downloadUrl = await uploadAvatarResult.ref.getDownloadURL()
-
-            const userAvatarRef = database.ref(`/profile/${profile.uid}`).child("avatar")
-
-            userAvatarRef.set(downloadUrl)
+            const avatarFileRef = storage
+            .ref(`/profile/${profile.uid}`)
+            .child('avatar');
+    
+    // upload image to storage
+          const uploadAvatarResult = await avatarFileRef.put(blob, {
+            cacheControl: `public, max-age=${3600 * 24 * 3}`,
+          });
+          const downloadUrl = await uploadAvatarResult.ref.getDownloadURL();
+    
+          const userAvatarRef = database
+            .ref(`/profiles/${profile.uid}`)
+            .child('avatar');
+    
+    // save uploaded image URL to database
+          userAvatarRef.set(downloadUrl);         //await
 
             setLoading(false)
             Alert.info("Avatar has been uploaded", 4000)
@@ -74,6 +81,11 @@ const AvatarUploadBtn = () => {
 
     return (
         <div className='mt-3 text-center'>
+            <ProfileAvatar
+                src={profile.avatar}
+                name={profile.name}
+                className="width-200 height-200 img-fullsize font-huge"
+            />
             <div>
                 <label htmlFor='avatar-upload' className='d-block cursor-pointer padded'>
                     Select New Avatar
@@ -114,3 +126,33 @@ const AvatarUploadBtn = () => {
 }
 
 export default AvatarUploadBtn
+
+/*
+service firebase.storage {
+    match /b/{bucket}/o {
+      match /{allPaths=**} {
+        allow read, write: if false;
+      }
+    }
+  }
+
+  */
+
+
+
+
+
+  
+//   {
+//     "rules": {
+//       "profiles":{
+//         "$user_id":{
+//           ".read":"$user_id===auth.uid",
+//             ".write":"$user_id===auth.uid"
+//         }
+//       },
+//       ".read": false,
+//       ".write": false
+//     }
+//   }   
+  
